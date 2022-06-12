@@ -45,12 +45,14 @@ class BedWarsCommand extends Command {
     public function execute(CommandSender $sender, string $commandLabel, array $args) {
         $helpM = "
                 §l§b===================================\n" .
-            "§aBedWars 4vs4vs4vs4\n".
-            "§7/bw help\n".
-            "§7/bw create\n".
-            "§7/bw remove\n".
-            "§7/bw set\n".
-            "§7/bw list\n§l§b===================================
+               "§aBedWars 4vs4vs4vs4\n".
+               "§7/bw help\n".
+               "§7/bw create\n".
+               "§7/bw remove\n".
+               "§7/bw set\n".
+               "§7/bw list\n".
+               "§7/bw random\n".
+               "§l§b==================================="
                     ";
         if(!isset($args[0])) {
             $sender->sendMessage($helpM);
@@ -62,6 +64,7 @@ class BedWarsCommand extends Command {
         switch ($args[0]) {
             case "help":
                 $sender->sendMessage($helpM);
+                $this->setPermission("bw.cmd.help");
                 break;
 
             case "create":
@@ -86,7 +89,7 @@ class BedWarsCommand extends Command {
                     break;
                 }
                 if(!isset($args[1])) {
-                    $sender->sendMessage("§cUsage: §7/bwremove <arenaName>");
+                    $sender->sendMessage("§cUsage: §7/bw remove <arenaName>");
                     break;
                 }
                 if(!isset($this->plugin->arenas[$args[1]])) {
@@ -145,7 +148,7 @@ class BedWarsCommand extends Command {
                 $this->plugin->joinToRandomArena($sender);
                 break;
             case "test":
-                if(!$sender->hasPermission("bw.test")){
+                if(!$sender->hasPermission("bw.cmd.test")){
                     break;
                 }
                 for($i = 0; $i < 10; ++$i){
@@ -156,7 +159,7 @@ class BedWarsCommand extends Command {
                 $sender->sendMessage("§aSucessfuly Spawn 10 Bot");
             break;
             case "list":
-                if(!$sender->hasPermission("bw.list")){
+                if(!$sender->hasPermission("bw.cmd.list")){
                     break;
                 }
                 if(count($this->plugin->arenas) === 0) {
