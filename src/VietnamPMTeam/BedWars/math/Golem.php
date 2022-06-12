@@ -1,6 +1,6 @@
 <?php
 
-namespace RolandDev\BedWars\math;
+namespace VietnamPMTeam\BedWars\math;
 
 use pocketmine\event\entity\{EntityDamageByChildEntityEvent,EntityDamageEvent, EntityDamageByEntityEvent};
 use pocketmine\block\{Block,Fence,FenceGate,Liquid,Stair,Air,StoneSlab};
