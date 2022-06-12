@@ -7,7 +7,7 @@ namespace VietnamPMTeam\BedWars\math;
 use pocketmine\block\Air;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockIds;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\projectile\Egg as Sarkas;
 use pocketmine\player\Player;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
@@ -60,7 +60,7 @@ class Egg extends Sarkas
           }
             foreach($this->arena->data["location"] as $spawn){
                 $v = Vector3::fromString($spawn);
-                if($body->distance($v->asVector3()) < 6){
+                if($body->distance($v->getPosition()->asVector3()) < 6){
                     return;
                 }
 
@@ -69,7 +69,7 @@ class Egg extends Sarkas
                         
                         BedWars::getInstance()->getArenaByPlayer($this->owner)->addPlacedBlock($this->getWorld()->getBlockAt($body->x,$body->y,$body->z));
                         
-                        $this->getWorld()->setBlock($body,BlockFactory::getInstance()->get(BlockIds::WOOL,$meta[$this->team]),false,true);
+                        $this->getWorld()->setBlock($body,BlockFactory::getInstance()->get(BlockLegacyIds::WOOL,$meta[$this->team]),false,true);
                       
                     }
                   
@@ -94,8 +94,8 @@ class Egg extends Sarkas
         $pk->volume = 100;
         $pk->pitch = 1;
         $pk->soundName = 'random.pop';
-        $player->getNetworkSession()->dataPacket($pk);
-        //Server::getInstance()->broadcastPacket($player->getLevel()->getPlayers(), $pk);
+        $player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
+        //Server::getInstance()->broadcastPacket($player->getWorld()->getPlayers(), $pk);
     }
 
 
@@ -104,7 +104,7 @@ class Egg extends Sarkas
 
     public function entityBaseTick(int $tickDiff = -1): bool
     {
-        if($this->getLevel()->getBlockAt($this->x,$this->y,$this->z) instanceof Air){
+        if($this->getWorld()->getBlockAt($this->x,$this->y,$this->z) instanceof Air){
             $this->everbody[] = $this->asPosition();
             $this->everbody[] = $this->asPosition()->add(2);
         }

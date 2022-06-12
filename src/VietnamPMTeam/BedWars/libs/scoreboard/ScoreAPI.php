@@ -33,7 +33,7 @@ class ScoreAPI {
 		$pk->displayName = $displayName;
 		$pk->criteriaName = "dummy";
 		$pk->sortOrder = 0;
-		$pl->getNetworkSession()->sendDataPacket($pk);
+		$pl->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		$this->scoreboards[$pl->getName()] = $objectiveName;
 	}
 	
@@ -42,7 +42,7 @@ class ScoreAPI {
 			$objectiveName = $this->getObjectiveName($pl);
 			$pk = new RemoveObjectivePacket();
 			$pk->objectiveName = $objectiveName;
-			$pl->getNetworkSession()->sendDataPacket($pk);
+			$pl->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 			unset($this->scoreboards[$pl->getName()]);
 		}
 	}
@@ -62,7 +62,7 @@ class ScoreAPI {
 		$pk = new SetScorePacket();
 		$pk->type = $pk::TYPE_CHANGE;
 		$pk->entries[] = $entry;
-		$pl->getNetworkSession()->sendDataPacket($pk);
+		$pl->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 	}
 	
 	public function getObjectiveName(Player $pl) : ?string {

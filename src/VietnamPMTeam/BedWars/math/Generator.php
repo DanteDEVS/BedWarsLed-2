@@ -12,7 +12,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\network\mcpe\protocol\PlaySoundPacket;
 
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class Generator extends Human {
 
@@ -37,8 +37,8 @@ class Generator extends Human {
         parent::initEntity();
         $this->setNameTagAlwaysVisible(true);
         $this->setHealth(100);
-        $this->startPos = $this->asVector3();
-        $this->setFood(20);
+        $this->startPos = $this->getPosition()->asVector3();
+        $this->getHungerManager()->setFood(20);
 
     }
 
@@ -78,28 +78,28 @@ class Generator extends Human {
                     $this->start = 0;
                 }
                 if($this->start == 3){
-                    $entities = $this->getLevel()->getPlayers();
+                    $entities = $this->getWorld()->getPlayers();
                     foreach($entities as $player){
                         if($player instanceof Player){
-                            if($player->distance($this->asVector3()) < 3){
+                            if($player->distance($this->getPosition()->asVector3()) < 3){
                                 $pk = new PlaySoundPacket();
-                                $pk->x = $player->getX();
-                                $pk->y = $player->getY();
-                                $pk->z = $player->getZ();
+                                $pk->x = $player->getPosition()->getX();
+                                $pk->y = $player->getPosition()->getY();
+                                $pk->z = $player->getPosition()->getZ();
                                 $pk->volume = 100;
                                 $pk->pitch = 1;
                                 $pk->soundName = 'beacon.activate';
-                                $player->dataPacket($pk);
+                                $player->getNetworkSession()->sendDataPacket($pk);
                             } else {
-                                if($player->distance($this->asVector3()) < 7){
+                                if($player->distance($this->getPosition()->asVector3()) < 7){
                                     $pk = new PlaySoundPacket();
-                                    $pk->x = $player->getX();
-                                    $pk->y = $player->getY();
-                                    $pk->z = $player->getZ();
+                                    $pk->x = $player->getPosition()->getX();
+                                    $pk->y = $player->getPosition()->getY();
+                                    $pk->z = $player->getPosition()->getZ();
                                     $pk->volume = 30;
                                     $pk->pitch = 1;
                                     $pk->soundName = 'beacon.activate';
-                                    $player->dataPacket($pk);
+                                    $player->getNetworkSession()->sendDataPacket($pk);
                                 }
                             }
                         }
@@ -122,12 +122,12 @@ class Generator extends Human {
                 }
                 if($this->emtime == 0){
                     $this->emtime = 40;
-                    $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::EMERALD), new Vector3(0, -1, 0));
+                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::EMERALD), new Vector3(0, -1, 0));
                 }
                 $p = 0;
                 $i = 0;
 
-                $entities = $this->getLevel()->getNearbyEntities($this->getBoundingBox()->expandedCopy(1, 1, 1));
+                $entities = $this->getWorld()->getNearbyEntities($this->getBoundingBox()->expandedCopy(1, 1, 1));
                 foreach($entities as $player){
                     if($player instanceof Player){
                         $p++;
@@ -151,11 +151,11 @@ class Generator extends Human {
                     if($p > 0){
                         foreach($entities as $player){
                             if($player instanceof Player && !$player->isSpectator()){
-                                if($player->getInventory()->canAddItem(Item::get(Item::GOLD_INGOT, 0, $amount))){
+                                if($player->getInventory()->canAddItem(\pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::GOLD_INGOT, 0, $amount))){
                                     $this->addSound($player, 'random.pop', 1.5);
-                                    $player->getInventory()->addItem(Item::get(Item::GOLD_INGOT, 0, $amount));
+                                    $player->getInventory()->addItem(\pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::GOLD_INGOT, 0, $amount));
                                 } else {
-                                    $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
+                                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
                                 }
                             }
                         }
@@ -166,14 +166,14 @@ class Generator extends Human {
                                 $itemEntity = $iEntity;
                             }
                             if($itemEntity instanceof ItemEntity){
-                                if($itemEntity->getItem()->getId() == Item::GOLD_INGOT){
+                                if($itemEntity->getItem()->getId() == \pocketmine\item\ItemIds::GOLD_INGOT){
                                     $itemEntity->getItem()->setCount($itemEntity->getItem()->getCount() + $amount);
                                 } else {
-                                    $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
+                                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
                                 }
                             }
                         } else {
-                            $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
+                            $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::GOLD_INGOT, 0, $amount), new Vector3(0, -1, 0));
                         }
                     }
                 }
@@ -192,11 +192,11 @@ class Generator extends Human {
                     if($p > 0){
                         foreach($entities as $player){
                             if($player instanceof Player && !$player->isSpectator()){
-                                if($player->getInventory()->canAddItem(Item::get(Item::IRON_INGOT, 0, $ironamount))){
+                                if($player->getInventory()->canAddItem(\pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::IRON_INGOT, 0, $ironamount))){
                                     $this->addSound($player, 'random.pop', 1.5);
-                                    $player->getInventory()->addItem(Item::get(Item::IRON_INGOT, 0, $ironamount));
+                                    $player->getInventory()->addItem(\pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::IRON_INGOT, 0, $ironamount));
                                 } else {
-                                    $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
+                                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
                                 }
                             }
                         }
@@ -207,14 +207,14 @@ class Generator extends Human {
                                 $itemEntity = $iEntity;
                             }
                             if($itemEntity instanceof ItemEntity){
-                                if($itemEntity->getItem()->getId() == Item::IRON_INGOT){
+                                if($itemEntity->getItem()->getId() == \pocketmine\item\ItemIds::IRON_INGOT){
                                     $itemEntity->getItem()->setCount($itemEntity->getItem()->getCount() + $ironamount);
                                 } else {
-                                    $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
+                                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
                                 }
                             }
                         } else {
-                            $this->level->dropItem($this->asVector3()->add(0, 0.5), Item::get(Item::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
+                            $this->level->dropItem($this->getPosition()->asVector3()->add(0, 0.5), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::IRON_INGOT, 0, $ironamount), new Vector3(0, -1, 0));
                         }
                     }
                 }
@@ -236,7 +236,7 @@ class Generator extends Human {
                 }
                 if($this->dmtime == 0){
                     $this->dmtime = $max;
-                    $this->level->dropItem($this->asVector3()->add(0, -2), Item::get(Item::DIAMOND), new Vector3(0, -1, 0));
+                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, -2), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::DIAMOND), new Vector3(0, -1, 0));
                 }
             }
             if($this->type == "emerald"){
@@ -256,7 +256,7 @@ class Generator extends Human {
                 }
                 if($this->emtime == 0){
                     $this->emtime = $max;
-                    $this->level->dropItem($this->asVector3()->add(0, -2), Item::get(Item::EMERALD), new Vector3(0, -1, 0));
+                    $this->level->dropItem($this->getPosition()->asVector3()->add(0, -2), \pocketmine\item\ItemFactory::getInstance()->get(\pocketmine\item\ItemIds::EMERALD), new Vector3(0, -1, 0));
                 }
             }
             $this->c = 0;
@@ -267,13 +267,13 @@ class Generator extends Human {
 
     public function addSound($player, string $sound = '', float $pitch = 1){
         $pk = new PlaySoundPacket();
-        $pk->x = $player->getX();
-        $pk->y = $player->getY();
-        $pk->z = $player->getZ();
+        $pk->x = $player->getPosition()->getX();
+        $pk->y = $player->getPosition()->getY();
+        $pk->z = $player->getPosition()->getZ();
         $pk->volume = 2;
         $pk->pitch = $pitch;
         $pk->soundName = $sound;
-        $player->dataPacket($pk);
-        //Server::getInstance()->broadcastPacket($player->getLevel()->getPlayers(), $pk);
+        $player->getNetworkSession()->sendDataPacket($pk);
+        //Server::getInstance()->broadcastPacket($player->getWorld()->getPlayers(), $pk);
     }
 } 

@@ -75,7 +75,7 @@ class TaskTick extends Task {
         $pk->volume = 100;
         $pk->pitch = $pitch;
         $pk->soundName = $sound;
-        $player->getNetworkSession()->sendDataPacket($pk);
+        $player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
         return true;
     }
 
@@ -159,35 +159,35 @@ class TaskTick extends Task {
 						$this->plugin->broadcastMessage("§eThe game has starts in §c5 §eseconds!");
 						foreach ($this->plugin->players as $players) {
 							$this->addSound($players, 'random.toast', 1.5);
-							$players->addTitle("§c5");
+							$players->sendTitle("§c5");
 						}
 					}
 					if ($this->waitTime[$this->plugin->data["level"]] == 4) {
 						$this->plugin->broadcastMessage("§eThe game has starts in §c4 §eseconds!");
 						foreach ($this->plugin->players as $players) {
 							$this->addSound($players, 'random.toast', 1.5);
-							$players->addTitle("§c4");
+							$players->sendTitle("§c4");
 						}
 					}
 					if ($this->waitTime[$this->plugin->data["level"]] == 3) {
 						$this->plugin->broadcastMessage("§eThe game has starts in §c3 §eseconds!");
 						foreach ($this->plugin->players as $players) {
 							$this->addSound($players, 'random.toast', 1.5);
-							$players->addTitle("§c3");
+							$players->sendTitle("§c3");
 						}
 					}
 					if ($this->waitTime[$this->plugin->data["level"]] == 2) {
 						$this->plugin->broadcastMessage("§eThe game has starts in §c2 §eseconds!");
 						foreach ($this->plugin->players as $players) {
 							$this->addSound($players, 'random.toast', 1.5);
-							$players->addTitle("§c2");
+							$players->sendTitle("§c2");
 						}
 					}
 					if ($this->waitTime[$this->plugin->data["level"]] == 1) {
 						$this->plugin->broadcastMessage("§eThe game has starts in §c1 §eseconds!");
 						foreach ($this->plugin->players as $players) {
 							$this->addSound($players, 'random.toast', 1.5);
-							$players->addTitle("§c1");
+							$players->sendTitle("§c1");
 						}
 					}
 					if($this->waitTime[$this->plugin->data["level"]] == 0){
@@ -341,9 +341,9 @@ class TaskTick extends Task {
                     if(isset($this->plugin->utilities[$this->plugin->level->getFolderName()][$team]["haste"])){
                         if($this->plugin->getTeam($pt) == $team){
                             if($this->plugin->utilities[$this->plugin->level->getFolderName()][$team]["haste"] > 1){
-                                $eff = new EffectInstance(Effect::getEffect(Effect::HASTE), 60, ($this->plugin->utilities[$this->plugin->level->getFolderName()][$team]["haste"]  - 2));
+                                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::HASTE), 60, ($this->plugin->utilities[$this->plugin->level->getFolderName()][$team]["haste"]  - 2));
                                 $eff->setVisible(false);
-                                $pt->addEffect($eff);
+                                $pt->getEffects()->all()->add($eff);
                             }
                         }
                     }
@@ -352,9 +352,9 @@ class TaskTick extends Task {
                         if($this->plugin->getTeam($pt) == $team){
                             if($this->plugin->utilities[$this->plugin->level->getFolderName()][$team]["health"] > 1){
                                 if($pt->distance($pos) < 10){
-                                    $eff = new EffectInstance(Effect::getEffect(Effect::REGENERATION), 60, 0);
+                                    $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::REGENERATION), 60, 0);
                                     $eff->setVisible(false);
-                                    $pt->addEffect($eff);
+                                    $pt->getEffects()->all()->add($eff);
                                 }
                             }
                         }
@@ -368,12 +368,12 @@ class TaskTick extends Task {
                     }
                     if($team == ""){
                     }
-                    if(!$player->hasEffect(14)){
+                    if(!$player->getEffects()->all()->has(14)){
                         if(isset($this->invis[$player->getId()])){
                             $this->plugin->setInvis($player, false);
                         }
                     }
-                    $player->setFood(20);
+                    $player->getHungerManager()->setFood(20);
                     $kills = $this->counter($player,"kill");
                     $fkills = $this->counter($player,"fk");
                     $broken = $this->counter($player,"broken");

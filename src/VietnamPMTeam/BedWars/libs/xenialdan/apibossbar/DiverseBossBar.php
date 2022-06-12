@@ -163,7 +163,7 @@ class DiverseBossBar extends BossBar
 		foreach ($players as $player) {
 			if(!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($this->addDefaults($player, $pk));
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($this->addDefaults($player, $pk));
 		}
 	}
 
@@ -177,7 +177,7 @@ class DiverseBossBar extends BossBar
 		foreach ($players as $player) {
 			if(!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($this->addDefaults($player, $pk));
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($this->addDefaults($player, $pk));
 		}
 	}
 
@@ -192,7 +192,7 @@ class DiverseBossBar extends BossBar
 			if(!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
 			$pk->title = $this->getFullTitleFor($player);
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
@@ -207,7 +207,7 @@ class DiverseBossBar extends BossBar
 		foreach ($players as $player) {
 			if(!$player->isConnected()) continue;
 			$pk->entries = $this->getAttributeMap($player)->needSend();
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
@@ -222,7 +222,7 @@ class DiverseBossBar extends BossBar
 			if(!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
 			$pk->healthPercent = $this->getPercentageFor($player);
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 

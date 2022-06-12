@@ -109,7 +109,7 @@ final class PlayerNetwork{
 			$pk = new NetworkStackLatencyPacket();
 			$pk->timestamp = $entry->network_timestamp;
 			$pk->needResponse = true;
-			if($this->session->sendDataPacket($pk)){
+			if($this->session->getNetworkSession()->sendDataPacket($pk)){
 				$entry->sent_at = microtime(true) * 1000;
 			}else{
 				$this->processCurrent(false);

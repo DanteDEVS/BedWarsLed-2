@@ -205,7 +205,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
 		}
 	}
 
@@ -229,7 +229,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
 		}
 	}
 
@@ -296,7 +296,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($this->addDefaults($pk));
 		}
 	}
 
@@ -310,7 +310,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
@@ -325,7 +325,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
@@ -352,7 +352,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $this->actorId ?? $player->getId();
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 
@@ -395,7 +395,7 @@ class BossBar
 		foreach ($players as $player) {
 			if (!$player->isConnected()) continue;
 			$pk->bossActorUniqueId = $player->getId();
-			$player->getNetworkSession()->sendDataPacket($pk);
+			$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
 		}
 	}
 

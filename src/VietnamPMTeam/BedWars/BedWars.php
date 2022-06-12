@@ -98,7 +98,7 @@ class BedWars extends PluginBase implements Listener {
      */
     public $upgrade;
 
-    public function onEnable() : void {
+    protected function onEnable(): void{
         self::$instance = $this;
         self::$score = new ScoreAPI($this);
         $this->saveResource("config.yml");
@@ -152,7 +152,7 @@ class BedWars extends PluginBase implements Listener {
         EntityFactory::getInstance()->register(EnderDragon::class, true);
         EntityFactory::getInstance()->register(ShopVillager::class, true);
         EntityFactory::getInstance()->register(UpgradeVillager::class, true);
-        EntityFactory::getInstance()->register(Generator::class, true);
+        EntityFactory::getInstance()->register(\pocketmine\world\generator\GeneratorManager::getInstance()->class, true);
         EntityFactory::getInstance()->register(Bedbug::class, true);
         EntityFactory::getInstance()->register(Egg::class,true);
         EntityFactory::getInstance()->register(Golem::class, true);
@@ -199,7 +199,7 @@ class BedWars extends PluginBase implements Listener {
         return new Skin("Standard_CustomSlim", $bytes);
     }
 
-    public function onDisable() : void {
+    protected function onDisable(): void{
         $this->dataProvider->saveArenas();
         if(file_exists($this->getDataFolder()."finalkills.yml")){
             unlink($this->getDataFolder()."finalkills.yml");
@@ -260,7 +260,7 @@ class BedWars extends PluginBase implements Listener {
                     }
                 }
 
-                $player->sendMessage("§aDragon position 2 set to {$player->getPosition()->asVector3()->__toString()} in world {$world->getName()}");
+                $player->sendMessage("§aDragon position 2 set to {$player->getPosition()->getPosition()->asVector3()->__toString()} in world {$world->getName()}");
                 $arena->data["corner1"] =  (new Vector3((int)$firstPos->getX(), (int)$firstPos->getY(), (int)$firstPos->getZ()))->__toString();
                 $arena->data["corner2"] = (new Vector3((int)$player->getPosition()->getX(), (int)$player->getPosition()->getY(), (int)$player->getPosition()->getZ()))->__toString();
                 $arena->data["blocks"] = $blocks;
@@ -299,7 +299,7 @@ class BedWars extends PluginBase implements Listener {
                 $this->shop[$player->getName()]++;
             break;
             case "setdistance":
-              $arena->data["distance"] = Vector3::fromString($arena->data["location"]["red"])->distance($player->getEyePos()->asVector3());
+              $arena->data["distance"] = Vector3::fromString($arena->data["location"]["red"])->distance($player->getEyePos()->getPosition()->asVector3());
             break;
             case "location":
                 if(!in_array($args[1], ["red", "blue", "yellow", "green"])){
@@ -326,8 +326,8 @@ class BedWars extends PluginBase implements Listener {
                 $player->sendMessage("§a Bed position $args[1] set to X: " . (string)floor($player->getPosition()->getX()) . " Y: " . (string)floor($player->getPosition()->getY()) . " Z: " . (string)floor($player->getPosition()->getZ()));
                 break; 
             case "lobby":
-                $arena->data["lobby"] = (new Vector3(floor($player->getX()) + 0.0, floor($player->getY()), floor($player->getZ()) + 0.0))->__toString();
-                $player->sendMessage("§bLobby set to X: " . (string)floor($player->getX()) . " Y: " . (string)floor($player->getY()) . " Z: " . (string)floor($player->getZ()));
+                $arena->data["lobby"] = (new Vector3(floor($player->getPosition()->getX()) + 0.0, floor($player->getPosition()->getY()), floor($player->getPosition()->getZ()) + 0.0))->__toString();
+                $player->sendMessage("§bLobby set to X: " . (string)floor($player->getPosition()->getX()) . " Y: " . (string)floor($player->getPosition()->getY()) . " Z: " . (string)floor($player->getPosition()->getZ()));
                 break;
             case "joinsign":
                 $player->sendMessage("§a> Break block to set join sign!");

@@ -11,9 +11,9 @@ use pocketmine\entity\Creature;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Animal;
 use pocketmine\entity\EffectInstance;
-use pocketmine\level\Level;
+use pocketmine\world\World;
 use pocketmine\network\mcpe\protocol\ActorEventPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use RolandDev\BedWars\Game;
 use InvalidStateException;
@@ -40,7 +40,7 @@ class Golem extends Animal{
     
     public $moveTime = 0;
     
-    public function __construct(Level $level, CompoundTag $nbt){
+    public function __construct(World $level, CompoundTag $nbt){
         parent::__construct($level, $nbt);
     }
     
@@ -206,7 +206,7 @@ class Golem extends Animal{
             if($this->isOnGround()){
                 $this->motion->y = 0;
             }elseif($this->motion->y > -$this->gravity * 4){
-                if(!($this->getLevel()->getBlock(new Vector3(Math::floorFloat($this->x), (int) ($this->y + 0.8), Math::floorFloat($this->z))) instanceof Liquid)){
+                if(!($this->getWorld()->getBlock(new Vector3(Math::floorFloat($this->x), (int) ($this->y + 0.8), Math::floorFloat($this->z))) instanceof Liquid)){
                     $this->motion->y -= $this->gravity * 1;
                 }
             }else{
@@ -223,9 +223,9 @@ class Golem extends Animal{
 
     private function checkJump($dx, $dz): bool{
         if($this->motion->y == $this->gravity * 2){
-            return $this->getLevel()->getBlock(new Vector3(Math::floorFloat($this->x), (int) $this->y, Math::floorFloat($this->z))) instanceof Liquid;
+            return $this->getWorld()->getBlock(new Vector3(Math::floorFloat($this->x), (int) $this->y, Math::floorFloat($this->z))) instanceof Liquid;
         }else{
-            if($this->getLevel()->getBlock(new Vector3(Math::floorFloat($this->x), (int) ($this->y + 0.8), Math::floorFloat($this->z))) instanceof Liquid){
+            if($this->getWorld()->getBlock(new Vector3(Math::floorFloat($this->x), (int) ($this->y + 0.8), Math::floorFloat($this->z))) instanceof Liquid){
                 $this->motion->y = $this->gravity * 2;
                 return true;
             }
@@ -237,7 +237,7 @@ class Golem extends Animal{
             return false;
         }
 
-        $blockingBlock = $this->getLevel()->getBlock($this);
+        $blockingBlock = $this->getWorld()->getBlock($this);
         if($blockingBlock->canPassThrough()){
             try{
                 $blockingBlock = $this->getTargetBlock(2);
@@ -246,8 +246,8 @@ class Golem extends Animal{
             }
         }
         if($blockingBlock != null and !$blockingBlock->canPassThrough()){
-            $upperBlock = $this->getLevel()->getBlock($blockingBlock->add(0,1));
-            $secondUpperBlock = $this->getLevel()->getBlock($blockingBlock->add(0,2));
+            $upperBlock = $this->getWorld()->getBlock($blockingBlock->add(0,1));
+            $secondUpperBlock = $this->getWorld()->getBlock($blockingBlock->add(0,2));
 
             if($upperBlock->canPassThrough() && $secondUpperBlock->canPassThrough()){
                 if($blockingBlock instanceof Fence || $blockingBlock instanceof FenceGate){
@@ -285,7 +285,7 @@ class Golem extends Animal{
             return;
         } 
         if(!$this->target instanceof Player || !$this->target->isAlive() || $this->target->isClosed()){
-            foreach($this->getLevel()->getEntities() as $entity){
+            foreach($this->getWorld()->getEntities() as $entity){
                 if($entity === $this || !($entity instanceof Player) || $entity instanceof self){
                     continue;
                 }

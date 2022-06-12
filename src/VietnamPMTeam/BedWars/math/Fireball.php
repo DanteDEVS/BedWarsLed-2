@@ -130,11 +130,11 @@ class Fireball extends Throwable{
 
 		$list = $this->world->getNearbyEntities($explosionBB, $this);
 		foreach($list as $entity){
-			$distance = $entity->distance($this->asVector3()) / $explosionSize;
+			$distance = $entity->distance($this->getPosition()->asVector3()) / $explosionSize;
 
 			if($distance <= 2){
 				if($entity instanceof  Player) {
-					$motion = $entity->getPosition()->subtract($this->asVector3(), $this->asVector3(), $this->asVector3())->normalize();
+					$motion = $entity->getPosition()->subtract($this->getPosition()->asVector3(), $this->getPosition()->asVector3(), $this->getPosition()->asVector3())->normalize();
 					$ev = new EntityDamageByEntityEvent($this->getOwningEntity(), $entity, EntityDamageEvent::CAUSE_PROJECTILE, 3);
 					$entity->attack($ev);
 					$entity->setMotion($motion->multiply(2));

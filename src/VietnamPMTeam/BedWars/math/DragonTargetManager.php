@@ -56,7 +56,7 @@ class DragonTargetManager {
         $block = $this->plugin->level->getBlock($blockPos);
 
 
-        $this->plugin->level->setBlock($blockPos, BlockFactory::getInstance()->get(BlockLegacyIds::AIR));
+        $this->plugin->level->setBlock($blockPos, BlockFactory::getInstance()->get(BlockLegacyIds::AIR, 0));
 
         unset($this->blocks["$x:$y:$z"]);
 
@@ -76,7 +76,7 @@ class DragonTargetManager {
         };
 
         $dragon = new EnderDragon($this->plugin->level, EnderDragon::createBaseNBT($findSpawnPos($this->mid), new Vector3()), $this,$team);
-        $dragon->lookAt($this->mid->asVector3());
+        $dragon->lookAt($this->mid->getPosition()->asVector3());
         $dragon->setMaxHealth(70);
         $dragon->setHealth(70);
 

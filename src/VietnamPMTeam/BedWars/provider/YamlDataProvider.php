@@ -50,7 +50,7 @@ class YamlDataProvider {
         foreach ($this->plugin->arenas as $fileName => $arena) {
             if($arena->level instanceof World) {
                 foreach ($arena->players as $player) {
-                    $player->teleport($player->getServer()->getDefaultLevel()->getSpawnLocation());
+                    $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
                 }
                 $arena->draw();
                 // must be reseted

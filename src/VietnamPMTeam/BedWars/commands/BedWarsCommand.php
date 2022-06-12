@@ -10,7 +10,7 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
 use pocketmine\console\ConsoleCommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginBase;
 use VietnamPMTeam\BedWars\Game;
@@ -98,7 +98,7 @@ class BedWarsCommand extends Command {
                 $arena = $this->plugin->arenas[$args[1]];
 
                 foreach ($arena->players as $player) {
-                    $player->teleport($this->plugin->getServer()->getDefaultLevel()->getSpawnLocation());
+                    $player->teleport($this->plugin->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
                 }
 
                 if(is_file($file = $this->plugin->getDataFolder() . "arenas" . DIRECTORY_SEPARATOR . $args[1] . ".yml")) unlink($file);
@@ -125,13 +125,13 @@ class BedWarsCommand extends Command {
                     $sender->sendMessage("§bArena $args[1] does not found!");
                     break;
                 }
-                if(!$sender->getServer()->isLevelGenerated($args[1])){
+                if(!$sender->getServer()->getWorldManager()->isWorldGenerated($args[1])){
                     $sender->sendMessage("§bWorld not found");
                     break;
                 }
                 $sender->sendMessage("§bYou've joined setup mode");
-                if(!$sender->getServer()->isLevelLoaded($args[1])) {
-                    $sender->getServer()->loadLevel($args[1]);
+                if(!$sender->getServer()->getWorldManager()->isWorldLoaded($args[1])) {
+                    $sender->getServer()->getWorldManager()->loadWorld($args[1]);
                 }
                 
                  $this->plugin->startSetup($sender,$args[1]);

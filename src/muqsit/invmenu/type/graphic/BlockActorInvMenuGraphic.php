@@ -49,7 +49,7 @@ final class BlockActorInvMenuGraphic implements PositionedInvMenuGraphic{
 		if($name !== null){
 			$this->tile->setString(Nameable::TAG_CUSTOM_NAME, $name);
 		}
-		$player->getNetworkSession()->sendDataPacket(BlockActorDataPacket::create(BlockPosition::fromVector3($this->position), new CacheableNbt($this->tile)));
+		$player->getNetworkSession()->getNetworkSession()->sendDataPacket(BlockActorDataPacket::create(BlockPosition::fromVector3($this->position), new CacheableNbt($this->tile)));
 	}
 
 	public function sendInventory(Player $player, Inventory $inventory) : bool{

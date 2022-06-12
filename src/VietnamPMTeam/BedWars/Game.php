@@ -336,11 +336,11 @@ class Game implements Listener
                 if ($e instanceof ShopVillager || $e instanceof UpgradeVillager) {
                     $pk = new MoveActorAbsolutePacket();
                     $pk->entityRuntimeId = $e->getId();
-                    $pk->position = $e->getPosition()->asVector3();
+                    $pk->position = $e->getPosition()->getPosition()->asVector3();
                     $pk->xRot = $pitch;
                     $pk->yRot = $yaw;
                     $pk->zRot = $yaw;
-                    $player->getNetworkSession()->sendDataPacket($pk);
+                    $player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
                 }
             }
         }
@@ -383,7 +383,7 @@ class Game implements Listener
 
 
         $this->plugin->arenaPlayer[$player->getName()] = $this;
-        $player->getEffects()->clear();
+        $player->getEffects()->all()->clear();
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->getEnderInventory()->clearAll();
@@ -394,7 +394,7 @@ class Game implements Listener
         $player->getInventory()->setItem(8, ItemFactory::getInstance()->get(ItemIds::BED, 14)->setCustomName("§aReturn to lobby"));
         $player->setGamemode(GameMode::ADVENTURE());
         $player->setHealth(20);
-        $player->getHungerManager()->setFood(20);
+        $player->getHungerManager()->getHungerManager()->setFood(20);
         $player->setNameTagVisible();
         $this->broadcastMessage("§f{$player->getDisplayName()} §ejoined (§b" . count($this->players) . "§e/§b{$this->data["slots"]}§e)!");
 
@@ -592,7 +592,7 @@ class Game implements Listener
                     $spawn = Vector3::fromString($this->data["bed"][$team]);
                     foreach ($this->world->getEntities() as $g) {
                         if ($g instanceof Generator) {
-                            if ($g->getPosition()->asVector3()->distance($spawn) < 20) {
+                            if ($g->getPosition()->getPosition()->asVector3()->distance($spawn) < 20) {
                                 $g->close();
                             }
                         }
@@ -670,7 +670,7 @@ class Game implements Listener
                 $spawn = Vector3::fromString($this->data["bed"][$team]);
                 foreach ($this->world->getEntities() as $g) {
                     if ($g instanceof Generator) {
-                        if ($g->getPosition()->asVector3()->distance($spawn) < 20) {
+                        if ($g->getPosition()->getPosition()->asVector3()->distance($spawn) < 20) {
                             $g->close();
                         }
                     }
@@ -686,7 +686,7 @@ class Game implements Listener
 
         }
 
-        $player->addTitle("§l§cYOU DIED!", "§7You are now spectator");
+        $player->sendTitle("§l§cYOU DIED!", "§7You are now spectator");
 
         $player->setScoreTag("");
         $player->setNameTag($player->getDisplayName());
@@ -704,13 +704,13 @@ class Game implements Listener
         unset($this->pickaxe[$player->getId()]);
 
         unset($this->players[$player->getName()]);
-        $player->getEffects()->clear();
+        $player->getEffects()->all()->clear();
         $player->setGamemode(GameMode::SPECTATOR());
 
         $player->setHealth(20);
         $player->setAllowFlight(true);
         $player->setFlying(true);
-        $player->getHungerManager()->setFood(20);
+        $player->getHungerManager()->getHungerManager()->setFood(20);
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->getCursorInventory()->clearAll();
@@ -735,7 +735,7 @@ class Game implements Listener
 
             if (isset($this->spectators[$event->getOrigin()->getPlayer()->getName()])) {
                 $event->cancel();
-                $player->getNetworkSession()->sendDataPacket($packet);
+                $player->getNetworkSession()->getNetworkSession()->sendDataPacket($packet);
             }
             if ($this->inGame($player) && $this->phase == 0) {
                 if ($packet->sound == 42 || $packet->sound == 43 || $packet->sound == 41 || $packet->sound == 40 || $packet->sound == 35) {
@@ -771,7 +771,7 @@ class Game implements Listener
         $player->setHealth(20);
         $player->setAllowFlight(false);
         $player->setFlying(false);
-        $player->getHungerManager()->setFood(20);
+        $player->getHungerManager()->getHungerManager()->setFood(20);
         $this->teleport($player);
         $this->setArmor($player);
         $sword = ItemFactory::getInstance()->get(ItemIds::WOODEN_SWORD);
@@ -799,7 +799,7 @@ class Game implements Listener
                 for ($z = -15; $z <= 16; $z++) {
                     $world = $this->world;
                     $block = $world->getBlock($pos->add($x, $y, $z));
-                    (float)$world->setBlock($block, BlockFactory::getInstance()->get(0));
+                    (float)$world->setBlock($block, BlockFactory::getInstance()->get(0, 0));
                 }
             }
         }
@@ -1076,10 +1076,10 @@ class Game implements Listener
         if (!($player instanceof Player)) return;
 
         $player->getInventory()->clearAll();
-        $player->getEffects()->clear();
+        $player->getEffects()->all()->clear();
         $player->setGamemode(GameMode::SPECTATOR());
         $player->setAllowFlight(true);
-        $player->teleport($player->getPosition()->asVector3()->add(0, 5, -1));
+        $player->teleport($player->getPosition()->getPosition()->asVector3()->add(0, 5, -1));
         $player->sendTitle("§l§cYOU DIED!");
         $this->respawnC[$player->getName()] = 6;
         $axe = $this->getLessTier($player, true);
@@ -1093,7 +1093,7 @@ class Game implements Listener
      */
     public function addPlacedBlock(Block $block)
     {
-        $this->placedBlock[] = $block->getPosition()->asVector3()->__toString();
+        $this->placedBlock[] = $block->getPosition()->getPosition()->asVector3()->__toString();
 
     }
 
@@ -1210,13 +1210,13 @@ class Game implements Listener
                     new StringTag('Data', $skin->getSkinData()),
                     new StringTag('Name', 'Standard_CustomSlim'),
                     new StringTag('GeometryName', 'geometry.player_head'),
-                    new ByteArrayTag('GeometryData', Generator::GEOMETRY)]));
+                    new ByteArrayTag('GeometryData', \pocketmine\world\generator\GeneratorManager::getInstance()->GEOMETRY)]));
                 $g = new Generator($tile->getPosition()->getWorld(), $nbt);
                 $g->type = "gold";
                 $g->Glevel = 1;
                 $g->setScale(0.000001);
                 $g->spawnToAll();
-                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->getPosition()->x, $tile->getPosition()->y, $tile->getPosition()->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE));
+                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->getPosition()->x, $tile->getPosition()->y, $tile->getPosition()->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE, 0));
             }
             if ($tile instanceof EnchantTable) {
                 $nbt = $this->createBaseNBT(new Vector3($tile->x + 0.5, $tile->y + 4, $tile->z + 0.5));
@@ -1226,14 +1226,14 @@ class Game implements Listener
                     new StringTag('Data', $skin->getSkinData()),
                     new StringTag('Name', 'Standard_CustomSlim'),
                     new StringTag('GeometryName', 'geometry.player_head'),
-                    new ByteArrayTag('GeometryData', Generator::GEOMETRY)]));
+                    new ByteArrayTag('GeometryData', \pocketmine\world\generator\GeneratorManager::getInstance()->GEOMETRY)]));
                 $g = new Generator($tile->getPosition()->getWorld(), $nbt);
                 $g->type = "diamond";
                 $g->Glevel = 1;
                 $g->setScale(1.4);
                 $g->yaw = 0;
                 $g->spawnToAll();
-                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->x, $tile->y, $tile->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE));
+                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->x, $tile->y, $tile->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE, 0));
             }
             if ($tile instanceof Skull) {
                 $nbt = Entity::createBaseNBT(new Vector3($tile->x + 0.5, $tile->y + 4, $tile->z + 0.5));
@@ -1243,14 +1243,14 @@ class Game implements Listener
                     new StringTag('Data', $skin->getSkinData()),
                     new StringTag('Name', 'Standard_CustomSlim'),
                     new StringTag('GeometryName', 'geometry.player_head'),
-                    new ByteArrayTag('GeometryData', Generator::GEOMETRY)]));
+                    new ByteArrayTag('GeometryData', \pocketmine\world\generator\GeneratorManager::getInstance()->GEOMETRY)]));
                 $g = new Generator($tile->getPosition()->getWorld(), $nbt);
                 $g->type = "emerald";
                 $g->Glevel = 1;
                 $g->yaw = 0;
                 $g->setScale(1.4);
                 $g->spawnToAll();
-                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->getPosition()->x, $tile->getPosition()->y, $tile->getPosition()->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE));
+                $tile->getPosition()->getWorld()->setBlock(new Vector3($tile->getPosition()->x, $tile->getPosition()->y, $tile->getPosition()->z), BlockFactory::getInstance()->get(BlockLegacyIds::STONE, 0));
             }
         }
     }
@@ -1307,11 +1307,11 @@ class Game implements Listener
             $bed = $this->level->getBlockAt($pos->x, $pos->y, $pos->z);
             if ($bed instanceof Bed) {
                 $next = $bed->getOtherHalf();
-                $this->level->setBlock($bed, Block::get(0));
-                $this->level->setBlock($next, Block::get(0));
+                $this->level->setBlock($bed, \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
+                $this->level->setBlock($next, \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
                 foreach ($this->players as $player) {
                     if ($player instanceof Player) {
-                        $player->addTitle("§l§CBED DESTORYED", "§r§cyou will no longer respawn");
+                        $player->sendTitle("§l§CBED DESTORYED", "§r§cyou will no longer respawn");
                         $this->addSound($player, 'mob.wither.death');
                     }
                 }
@@ -1324,12 +1324,12 @@ class Game implements Listener
         if ($this->getCountTeam("red") <= 0) {
             $pos = Vector3::fromString($this->data["bed"]["red"]);
             if (($bed = $this->level->getBlockAt($pos->x, $pos->y, $pos->z)) instanceof Bed) {
-                $this->level->setBlock($bed, Block::get(0));
-                $this->level->setBlock($bed->getOtherHalf(), Block::get(0));
+                $this->level->setBlock($bed, \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
+                $this->level->setBlock($bed->getOtherHalf(), \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
             }
             foreach ($this->level->getEntities() as $g) {
                 if ($g instanceof Generator) {
-                    if ($g->asVector3()->distance($pos) < 20) {
+                    if ($g->getPosition()->asVector3()->distance($pos) < 20) {
                         $g->close();
                     }
                 }
@@ -1338,22 +1338,8 @@ class Game implements Listener
         if ($this->getCountTeam("blue") <= 0) {
             $pos = Vector3::fromString($this->data["bed"]["blue"]);
             if (($bed = $this->world->getBlockAt($pos->x, $pos->y, $pos->z)) instanceof Bed) {
-                $this->world->setBlock($bed, Block::get(0));
-                $this->world->setBlock($bed->getOtherHalf(), Block::get(0));
-            }
-            foreach ($this->world->getEntities() as $g) {
-                if ($g instanceof Generator) {
-                    if ($g->asVector3()->distance($pos) < 20) {
-                        $g->close();
-                    }
-                }
-            }
-        }
-        if ($this->getCountTeam("yellow") <= 0) {
-            $pos = Vector3::fromString($this->data["bed"]["yellow"]);
-            if (($bed = $this->world->getBlockAt($pos->x, $pos->y, $pos->z)) instanceof Bed) {
-                $this->world->setBlock($bed, Block::get(0));
-                $this->world->setBlock($bed->getOtherHalf(), Block::get(0));
+                $this->world->setBlock($bed, \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
+                $this->world->setBlock($bed->getOtherHalf(), \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
             }
             foreach ($this->world->getEntities() as $g) {
                 if ($g instanceof Generator) {
@@ -1363,15 +1349,29 @@ class Game implements Listener
                 }
             }
         }
-        if ($this->getCountTeam("green") <= 0) {
-            $pos = Vector3::fromString($this->data["bed"]["green"]);
+        if ($this->getCountTeam("yellow") <= 0) {
+            $pos = Vector3::fromString($this->data["bed"]["yellow"]);
             if (($bed = $this->world->getBlockAt($pos->x, $pos->y, $pos->z)) instanceof Bed) {
-                $this->world->setBlock($bed, BlockFactory::getInstance()->get(0));
-                $this->world->setBlock($bed->getOtherHalf(), BlockFactory::getInstance()->get(0));
+                $this->world->setBlock($bed, \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
+                $this->world->setBlock($bed->getOtherHalf(), \pocketmine\block\BlockFactory::getInstance()->get(0, 0));
             }
             foreach ($this->world->getEntities() as $g) {
                 if ($g instanceof Generator) {
-                    if ($g->asVector3()->distance($pos) < 20) {
+                    if ($g->getPosition()->getPosition()->asVector3()->distance($pos) < 20) {
+                        $g->close();
+                    }
+                }
+            }
+        }
+        if ($this->getCountTeam("green") <= 0) {
+            $pos = Vector3::fromString($this->data["bed"]["green"]);
+            if (($bed = $this->world->getBlockAt($pos->x, $pos->y, $pos->z)) instanceof Bed) {
+                $this->world->setBlock($bed, BlockFactory::getInstance()->get(0, 0));
+                $this->world->setBlock($bed->getOtherHalf(), BlockFactory::getInstance()->get(0, 0));
+            }
+            foreach ($this->world->getEntities() as $g) {
+                if ($g instanceof Generator) {
+                    if ($g->getPosition()->asVector3()->distance($pos) < 20) {
                         $g->close();
                     }
                 }
@@ -1392,8 +1392,8 @@ class Game implements Listener
             $next = $bed->getOtherHalf();
             $this->level->addParticle(new BlockBreakParticle($bed, $bed));
             $this->level->addParticle(new BlockBreakParticle($next, $bed));
-            $this->level->setBlock($bed, BlockFactory::getInstance()->get(0));
-            $this->level->setBlock($next, BlockFactory::getInstance()->get(0));
+            $this->level->setBlock($bed, BlockFactory::getInstance()->get(0, 0));
+            $this->level->setBlock($next, BlockFactory::getInstance()->get(0, 0));
         }
         $c = null;
         if ($team == "red") {
@@ -1537,7 +1537,7 @@ class Game implements Listener
             $cfg->save();
             if ($this->getTeam($player) == $team) {
                 $player->setHealth(20);
-                $player->getHungerManager()->setFood(20);
+                $player->getHungerManager()->getHungerManager()->setFood(20);
                 $player->getInventory()->clearAll();
                 $player->setGamemode(GameMode::ADVENTURE());
                 $this->plugin->mysqldata->addscore($player, "victory");
@@ -1628,7 +1628,7 @@ class Game implements Listener
                 return;
             }
             $player->setHealth(20);
-            $player->getHungerManager()->setFood(20);
+            $player->getHungerManager()->getHungerManager()->setFood(20);
             $player->setGamemode(GameMode::ADVENTURE());
             $player->getInventory()->clearAll();
             $player->getArmorInventory()->clearAll();
@@ -1687,7 +1687,7 @@ class Game implements Listener
                     $player->sendPopup($message);
                     break;
                 case self::MSG_TITLE:
-                    $player->addTitle($message, $subMessage);
+                    $player->sendTitle($message, $subMessage);
                     break;
             }
         }
@@ -1760,7 +1760,7 @@ class Game implements Listener
     {
         $entity = $event->getEntity();
         if ($entity->level->getFolderName() !== $this->level->getFolderName()) return;
-        $entities = $entity->getLevel()->getNearbyEntities($entity->getBoundingBox()->expandedCopy(1, 1, 1));
+        $entities = $entity->getWorld()->getNearbyEntities($entity->getBoundingBox()->expandedCopy(1, 1, 1));
         if (empty($entities)) {
             return;
         }
@@ -1806,24 +1806,24 @@ class Game implements Listener
         if ($this->inGame($player)) {
             if ($item->getId() == 373 && $item->getDamage() == 16) {
                 $event->cancel();
-                $player->getInventory()->setItemInHand(Item::get(0));
-                $eff = new EffectInstance(Effect::getEffect(Effect::SPEED), 900, 1);
+                $player->getInventory()->setItemInHand(\pocketmine\item\ItemFactory::getInstance()->get(0));
+                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::SPEED), 900, 1);
                 $eff->setVisible(true);
-                $player->addEffect($eff);
+                $player->getEffects()->all()->add($eff);
             }
             if ($item->getId() == 373 && $item->getDamage() == 11) {
                 $event->cancel();
-                $player->getInventory()->setItemInHand(Item::get(0));
-                $eff = new EffectInstance(Effect::getEffect(Effect::JUMP_BOOST), 900, 3);
+                $player->getInventory()->setItemInHand(\pocketmine\item\ItemFactory::getInstance()->get(0));
+                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::JUMP_BOOST), 900, 3);
                 $eff->setVisible(true);
-                $player->addEffect($eff);
+                $player->getEffects()->all()->add($eff);
             }
             if ($item->getId() == 373 && $item->getDamage() == 7) {
                 $event->cancel();
-                $player->getInventory()->setItemInHand(Item::get(0));
-                $eff = new EffectInstance(Effect::getEffect(Effect::INVISIBILITY), 600, 1);
+                $player->getInventory()->setItemInHand(\pocketmine\item\ItemFactory::getInstance()->get(0));
+                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::INVISIBILITY), 600, 1);
                 $eff->setVisible(true);
-                $player->addEffect($eff);
+                $player->getEffects()->all()->add($eff);
                 $this->setInvis($player, true);
             }
             if ($item->getId() == ItemIds::BUCKET && $item->getDamage() == 1) {
@@ -1846,10 +1846,10 @@ class Game implements Listener
                     $pk2 = new InventoryContentPacket();
                     $pk2->windowId = $player->getWindowId($arm);
                     $pk2->items = array_map([ItemStackWrapper::class, 'legacy'], $arm->getContents(true));
-                    $player->dataPacket($pk2);
+                    $player->getNetworkSession()->sendDataPacket($pk2);
                 } else {
                     if ($this->getTeam($player) !== $this->getTeam($p)) {
-                        $p->dataPacket($hide);
+                        $p->getNetworkSession()->sendDataPacket($hide);
                     }
                 }
             }
@@ -1865,10 +1865,10 @@ class Game implements Listener
                     $pk2 = new InventoryContentPacket();
                     $pk2->windowId = $player->getWindowId($arm);
                     $pk2->items = array_map([ItemStackWrapper::class, 'legacy'], $arm->getContents(true));
-                    $player->dataPacket($pk2);
+                    $player->getNetworkSession()->sendDataPacket($pk2);
                 } else {
                     if ($this->getTeam($player) !== $this->getTeam($p)) {
-                        $p->dataPacket($nohide);
+                        $p->getNetworkSession()->sendDataPacket($nohide);
                     }
                 }
             }
@@ -1880,10 +1880,10 @@ class Game implements Listener
         if ($hide) {
             $pk = new MobArmorEquipmentPacket();
             $pk->entityRuntimeId = $player->getId();
-            $pk->head = ItemStackWrapper::legacy(Item::get(ItemIds::AIR));
-            $pk->chest = ItemStackWrapper::legacy(Item::get(ItemIds::AIR));
-            $pk->legs = ItemStackWrapper::legacy(Item::get(ItemIds::AIR));
-            $pk->feet = ItemStackWrapper::legacy(Item::get(ItemIds::AIR));
+            $pk->head = ItemStackWrapper::legacy(\pocketmine\item\ItemFactory::getInstance()->get(ItemIds::AIR));
+            $pk->chest = ItemStackWrapper::legacy(\pocketmine\item\ItemFactory::getInstance()->get(ItemIds::AIR));
+            $pk->legs = ItemStackWrapper::legacy(\pocketmine\item\ItemFactory::getInstance()->get(ItemIds::AIR));
+            $pk->feet = ItemStackWrapper::legacy(\pocketmine\item\ItemFactory::getInstance()->get(ItemIds::AIR));
             $pk->encode();
             return $pk;
         } else {
@@ -1906,13 +1906,13 @@ class Game implements Listener
     {
         $tnt = $event->getEntity();
 
-        if ($tnt->getLevel()->getFolderName() !== $this->level->getFolderName()) return;
+        if ($tnt->getWorld()->getFolderName() !== $this->level->getFolderName()) return;
 
         if ($tnt instanceof PrimedTNT || $tnt instanceof Fireball) {
             $newList = [];
             foreach ($event->getBlockList() as $block) {
                 if ($block->getId() !== BlockLegacyIds::OBSIDIAN && $block->getId() !== 241) {
-                    if (in_array($block->getPosition()->asVector3()->__toString(), $this->placedBlock)) {
+                    if (in_array($block->getPosition()->getPosition()->asVector3()->__toString(), $this->placedBlock)) {
                         $newList[] = $block;
                     }
                 }
@@ -1949,8 +1949,8 @@ class Game implements Listener
             if ($this->phase == self::PHASE_LOBBY) {
                 $lv = Vector3::fromString($this->data["lobby"]);
                 $p = $lv->getY() - 3;
-                if ($player->getLevel()->getFolderName() == $this->level->getFolderName()) {
-                    if ($player->getY() < $p) {
+                if ($player->getWorld()->getFolderName() == $this->level->getFolderName()) {
+                    if ($player->getPosition()->getY() < $p) {
                         $player->teleport(Vector3::fromString($this->data["lobby"]));
                     }
                 }
@@ -1966,12 +1966,12 @@ class Game implements Listener
                             if (isset($this->itstrap[$teams])) {
                                 $this->utilities[$this->level->getFolderName()][$teams]["traps"]--;
                                 unset($this->itstrap[$teams]);
-                                $eff = new EffectInstance(Effect::getEffect(Effect::BLINDNESS), 160, 0);
+                                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::BLINDNESS), 160, 0);
                                 $eff->setVisible(true);
-                                $player->addEffect($eff);
-                                $eff = new EffectInstance(Effect::getEffect(Effect::SLOWNESS), 160, 1);
+                                $player->getEffects()->all()->add($eff);
+                                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::SLOWNESS), 160, 1);
                                 $eff->setVisible(true);
-                                $player->addEffect($eff);
+                                $player->getEffects()->all()->add($eff);
                                 foreach ($this->players as $p) {
                                     if ($this->getTeam($p) == $teams) {
                                         $p->sendTitle("§l§cTRAP TRIGGERED");
@@ -1979,11 +1979,11 @@ class Game implements Listener
                                 }
                             }
                             if (isset($this->minertrap[$teams])) {
-                                $this->utilities[$player->getLevel()->getFolderName()][$teams]["traps"]--;
+                                $this->utilities[$player->getWorld()->getFolderName()][$teams]["traps"]--;
                                 unset($this->minertrap[$teams]);
-                                $eff = new EffectInstance(Effect::getEffect(Effect::FATIGUE), 160, 0);
+                                $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::FATIGUE), 160, 0);
                                 $eff->setVisible(true);
-                                $player->addEffect($eff);
+                                $player->getEffects()->all()->add($eff);
                                 foreach ($this->players as $p) {
                                     if ($this->getTeam($p) == $teams) {
                                         $p->sendTitle("§l§cTRAP TRIGGERED");
@@ -1991,7 +1991,7 @@ class Game implements Listener
                                 }
                             }
                             if (isset($this->alarmtrap[$teams])) {
-                                $this->utilities[$player->getLevel()->getFolderName()][$teams]["traps"]--;
+                                $this->utilities[$player->getWorld()->getFolderName()][$teams]["traps"]--;
                                 unset($this->alarmtrap[$teams]);
                                 foreach ($this->players as $p) {
                                     if ($this->getTeam($p) == $teams) {
@@ -2000,17 +2000,17 @@ class Game implements Listener
                                 }
                             }
                             if (isset($this->countertrap[$teams])) {
-                                $this->utilities[$player->getLevel()->getFolderName()][$teams]["traps"]--;
+                                $this->utilities[$player->getWorld()->getFolderName()][$teams]["traps"]--;
                                 unset($this->countertrap[$teams]);
                                 foreach ($this->players as $p) {
                                     if ($this->getTeam($p) == $teams) {
                                         $p->sendTitle("§l§cTRAP TRIGGERED");
-                                        $eff = new EffectInstance(Effect::getEffect(Effect::SPEED), 300, 0);
+                                        $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::SPEED), 300, 0);
                                         $eff->setVisible(true);
-                                        $p->addEffect($eff);
-                                        $eff = new EffectInstance(Effect::getEffect(Effect::JUMP_BOOST), 300, 1);
+                                        $p->getEffects()->all()->add($eff);
+                                        $eff = new EffectInstance(\pocketmine\data\bedrock\EffectIdMap::getInstance()->fromId(Effect::JUMP_BOOST), 300, 1);
                                         $eff->setVisible(true);
-                                        $p->addEffect($eff);
+                                        $p->getEffects()->all()->add($eff);
 
                                     }
                                 }
@@ -2038,7 +2038,7 @@ class Game implements Listener
                     }
                 }
                 if ($pro instanceof Snowball) {
-                    $this->spawnBedbug($pro->asVector3(), $player->getLevel(), $player);
+                    $this->spawnBedbug($pro->getPosition()->asVector3(), $player->getWorld(), $player);
                 }
             }
         }
@@ -2266,7 +2266,7 @@ class Game implements Listener
                 }
             } else {
 
-                if (!in_array($block->getPosition()->asVector3()->__toString(), $this->placedBlock)) {
+                if (!in_array($block->getPosition()->getPosition()->asVector3()->__toString(), $this->placedBlock)) {
                     $event->cancel(true);
                     if (!$player->isSpectator()) {
                         $player->sendMessage("§cYou can't break block in here");
@@ -2275,7 +2275,7 @@ class Game implements Listener
 
                 } else {
                     $ar = array_values($this->placedBlock);
-                    unset($ar[$block->getPosition()->asVector3()->__toString()]);
+                    unset($ar[$block->getPosition()->getPosition()->asVector3()->__toString()]);
 
                 }
             }
@@ -2318,7 +2318,7 @@ class Game implements Listener
 
             foreach ($this->data["location"] as $spawn) {
                 $lv = Vector3::fromString($spawn);
-                if ($block->getPosition()->asVector3()->distance($lv) < 8) {
+                if ($block->getPosition()->getPosition()->asVector3()->distance($lv) < 8) {
                     $event->cancel();
                     $player->sendMessage("§cyou can't placed block in region base");
                 } else {
@@ -2340,7 +2340,7 @@ class Game implements Listener
 
     public function spawnTower(Player $player, Block $block)
     {
-        $rotation = ($player->getYaw() - 90.0) % 360.0;
+        $rotation = ($player->getLocation()->getYaw() - 90.0) % 360.0;
         if ($rotation < 0.0) {
             $rotation += 360.0;
         }
@@ -2585,7 +2585,7 @@ class Game implements Listener
                 if($this->phase == self::PHASE_GAME){
                     if($event instanceof EntityDamageByEntityEvent){
 						if($event->getDamager() instanceof EnderDragon){
-							$entity->asVector3()->multiply(2);
+							$entity->getPosition()->asVector3()->multiply(2);
 						}
 						if($event->getDamager() instanceof Player){
 
@@ -2626,7 +2626,7 @@ class Game implements Listener
 		
 		if(!$entity instanceof Player) return;
 
-		if(BedWars::getInstance()->getArenaByPlayer($entity)->level->getFolderName() !== $entity->getLevel()->getFolderName()){
+		if(BedWars::getInstance()->getArenaByPlayer($entity)->level->getFolderName() !== $entity->getWorld()->getFolderName()){
 			$event->cancel();
 		}
 		if(isset($this->respawnC[$entity->getName()])){
@@ -2812,7 +2812,7 @@ class Game implements Listener
 				if($player->getPosition()->getWorld()->getFolderName() == $this->world->getFolderName()){
 						if($pl->getDisplayName() == $target){
 						if($this->inGame($pl)){
-						$player->teleport($pl->getPosition()->asVector3());
+						$player->teleport($pl->getPosition()->getPosition()->asVector3());
 						$player->sendMessage("§eYou spectator {$pl->getName()}");
 						}
 					}
@@ -2860,7 +2860,7 @@ class Game implements Listener
 		$pk->volume = 4;
 		$pk->pitch = $pitch;
 		$pk->soundName = $sound;
-        $player->getNetworkSession()->sendDataPacket($pk);
+        $player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
     }
     
     public function stopSound($player, string $sound = '', bool $all = true){
@@ -2888,7 +2888,7 @@ class Game implements Listener
 		$this->utilities[$this->level->getFolderName()][$team]["generator"]++;
         foreach($this->level->getEntities() as $g){
             if($g instanceof Generator){
-                if($g->getPosition()->asVector3()->distance($pos) < 20){
+                if($g->getPosition()->getPosition()->asVector3()->distance($pos) < 20){
                     $g->Glevel = $g->Glevel + 1;
                 }
             }
@@ -3004,7 +3004,7 @@ class Game implements Listener
                         $this->upgradeSword($team, $player);
                         $this->addSound($pt, 'random.levelup');
                     } else {
-                        $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                        $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                     }
                 }
                 
@@ -3033,7 +3033,7 @@ class Game implements Listener
                         $this->addSound($pt, 'random.levelup');
                         $this->upgradeArmor($team, $player);
                     } else {
-                        $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                        $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                     }
                 }
                 
@@ -3054,7 +3054,7 @@ class Game implements Listener
                  $this->addSound($pt, 'random.levelup');
 		            $this->upgradeHaste($team, $player);
 		        } else {
-		          $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]); 
+		          $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]); 
 		        }
             }
         }
@@ -3070,7 +3070,7 @@ class Game implements Listener
 		             $this->addSound($pt, 'random.levelup');
 		            $this->upgradeGenerator($team, $player);
 		        } else {
-		         $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]); 
+		         $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]); 
 		        }
             }
         }
@@ -3086,7 +3086,7 @@ class Game implements Listener
 		           $this->addSound($pt, 'random.levelup');
 		            $this->upgradeHeal($team, $player);
 		        } else {
-		         $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+		         $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
 		        }
             } 
         }
@@ -3106,7 +3106,7 @@ class Game implements Listener
 		        }
 				$this->utilities[$this->world->getFolderName()][$team]["traps"]++;
             } else {
-		     $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+		     $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
         }
         if($item->getId() == ItemIds::FEATHER){
@@ -3124,7 +3124,7 @@ class Game implements Listener
 		        } 
 				$this->utilities[$this->world->getFolderName()][$team]["traps"]++;
             } else {
-		        $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+		        $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
         }
         if($item->getId() == BlockLegacyIds::LIT_REDSTONE_TORCH){
@@ -3142,7 +3142,7 @@ class Game implements Listener
 		        } 
 				$this->utilities[$this->world->getFolderName()][$team]["traps"]++;
             } else {
-		       $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+		       $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
         }
         if($item->getId() == ItemIds::WOODEN_PICKAXE){
@@ -3160,7 +3160,7 @@ class Game implements Listener
 		        } 
 				$this->utilities[$this->world->getFolderName()][$team]["traps"]++;
             } else {
-		        $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+		        $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
         }  
 	   
@@ -3345,11 +3345,11 @@ class Game implements Listener
                 $this->setSword($player, ItemFactory::getInstance()->get(ItemIds::STONE_SWORD));
             } else {
 				$this->notEnought($player,"Iron ingot");
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
          
 		    } else {
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                 $player->sendMessage("§cYou already bought this!");
             }
 			return;
@@ -3363,11 +3363,11 @@ class Game implements Listener
                 $this->setSword($player,  ItemFactory::getInstance()->get(ItemIds::IRON_SWORD));
             } else {
 				$this->notEnought($player,"Gold ingot");
-               $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+               $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
       
 		   } else {
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                 $player->sendMessage("§cYou already bought this!");
             }
 		   return; 
@@ -3380,11 +3380,11 @@ class Game implements Listener
                 $this->setSword($player,ItemFactory::getInstance()->get(ItemIds::DIAMOND_SWORD));
             } else {
 				$this->notEnought($player,"Emerald");
-               $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+               $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
 
 			} else {
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                 $player->sendMessage("§cYou already bought this!");
             }
 		 return;
@@ -3402,7 +3402,7 @@ class Game implements Listener
                 $this->setSword($player, $sword);
             } else {
 				$this->notEnought($player,"Gold ingot");
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
             return;
         }
@@ -3416,7 +3416,7 @@ class Game implements Listener
                 $pinv->addItem($stick);
             } else {
             	$this->notEnought($player,"Gold ingot");
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
             return;
         }
@@ -3430,7 +3430,7 @@ class Game implements Listener
                 $pinv->addItem($bow);
             } else {
             	$this->notEnought($player,"Gold ingot");
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
             return;
         }
@@ -3462,11 +3462,11 @@ class Game implements Listener
                     $this->setArmor($player);
                 } else {
                     $this->notEnought($player, "Iron ingot");
-                    $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                    $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                 }
                 return;
             } else {
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
             }
         }
         if($item instanceof Armor && $in == "§eIron Set"){
@@ -3479,7 +3479,7 @@ class Game implements Listener
                  $this->armor[$player->getName()] = "iron";
                 $this->setArmor($player);
             } else {
-               $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+               $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                $this->notEnought($player,"Gold ingot");
             } 
             return;
@@ -3494,7 +3494,7 @@ class Game implements Listener
                 $this->armor[$player->getName()] = "diamond";
                 $this->setArmor($player);
             } else {
-              $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+              $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
               $this->notEnought($player,"Emerald");
             }
             return;
@@ -3531,7 +3531,7 @@ class Game implements Listener
     	$pk->isBabyMob = false;
     	$pk->entityType = ":";
     	$pk->position = $player->getPosition();
-    	$player->getNetworkSession()->sendDataPacket($pk);
+    	$player->getNetworkSession()->getNetworkSession()->sendDataPacket($pk);
     	$player->sendMessage("§aYou purchased §7". $item);
 	}
 
@@ -3816,7 +3816,7 @@ class Game implements Listener
             }
             return $pickaxe[$tier];
         }
-        return Item::get(0);
+        return \pocketmine\item\ItemFactory::getInstance()->get(0);
     }
     
     public function getAxeByTier($player, bool $forshop = true) : Item{
@@ -3948,7 +3948,7 @@ class Game implements Listener
                     $player->getInventory()->addItem($item); 
                 }
             } else {
-                $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+                $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
                 $this->notEnought($player,$payment->getName());
             }
             return;
@@ -3969,7 +3969,7 @@ class Game implements Listener
                     $i = $slot;
                 }
             }
-            $payment = Item::get($id, 0, $value);
+            $payment = \pocketmine\item\ItemFactory::getInstance()->get($id, 0, $value);
             if ($player->getInventory()->contains($payment)) { 
                 $this->axe[$player->getId()] = $this->getNextTier($player, true); 
                 $player->getInventory()->removeItem($payment);
@@ -3982,26 +3982,26 @@ class Game implements Listener
                 }
             } else {
 				$this->notEnought($player,$payment->getName());
-              $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]); 
+              $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]); 
             }
             return; 
         }
-        $payment = Item::get($id, 0, $value);
+        $payment = \pocketmine\item\ItemFactory::getInstance()->get($id, 0, $value);
         if ($player->getInventory()->contains($payment)) {
             $player->getInventory()->removeItem($payment);
-            $it = Item::get($item->getId(), $item->getDamage(), $item->getCount());
+            $it = \pocketmine\item\ItemFactory::getInstance()->get($item->getId(), $item->getDamage(), $item->getCount());
             if(in_array($item->getCustomName(), ["§eMagic Milk", "§eBedbug", "§beream Defender", "§eFireball", "§eInvisibility Potion (30 seconds)", "§eSpeed Potion II (45 seconds)", "§eJump Potion III (45 seconds)"])){
                 $it->setCustomName("{$item->getCustomName()}");
             }
             if($player->getInventory()->canAddItem($it)){
                 $player->getInventory()->addItem($it); 
             } else {
-                $player->getLevel()->dropItem($player, $it);
+                $player->getWorld()->dropItem($player, $it);
             }
             $this->messagebuy($player,"{$item->getName()}");
         } else {
             $this->notEnought($player,$payment->getName());
-            $player->getLevel()->addSound(new EndermanTeleportSound($player), [$player]);
+            $player->getWorld()->addSound(new EndermanTeleportSound($player), [$player]);
         }
     }
 
@@ -4122,7 +4122,7 @@ class Game implements Listener
         if($this->data["level"] == null) {
             return false;
         }
-        if(!$this->plugin->getServer()->isLevelGenerated($this->data["level"])) {
+        if(!$this->plugin->getServer()->getWorldManager()->isWorldGenerated($this->data["level"])) {
             return false;
         }
         if(!is_int($this->data["slots"])) {

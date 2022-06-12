@@ -32,7 +32,7 @@ class UpgradeVillager extends Villager
     public function attack(EntityDamageEvent $source): void
     {
      $event = $source;
-     $event->setCancelled();
+     $event->cancel();
      $player = $source->getEntity();
      $arena =  $this->arena;
      if(!$arena instanceof Game){
