@@ -52,8 +52,7 @@ class BedWarsCommand extends Command {
                "§7/bw set\n".
                "§7/bw list\n".
                "§7/bw random\n".
-               "§l§b==================================="
-                    ";
+               "§l§b===================================";
         if(!isset($args[0])) {
             $sender->sendMessage($helpM);
 
