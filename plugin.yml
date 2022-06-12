@@ -3,3 +3,17 @@ api: 4.0.0
 version: 1.1 BETA
 main: VietnamPMTeam\BedWars\BedWars
 author: VietnamPMTeam
+
+permissions:
+  bw.cmd.help:
+    default: op
+  bw.cmd.remove:
+    default: op
+  bw.cmd.set:
+    default: op
+  bw.cmd.random:
+    default: true
+  bw.cmd.test:
+    default: op
+  bw.cmd.list:
+    default: op
