@@ -1,2 +1,2 @@
-# BedWarsLed-2
-BedWarsLed-2 - PM4 Version
+# Bedwars-PocketminePM4
+A Minigame for Pocketmine
