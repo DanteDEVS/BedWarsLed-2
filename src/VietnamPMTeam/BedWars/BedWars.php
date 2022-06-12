@@ -32,6 +32,7 @@ use VietnamPMTeam\BedWars\provider\YamlDataProvider;
 use pocketmine\entity\Skin;
 use pocketmine\entity\Entity;
 use pocketmine\entity\EntityFactory;
+use pocketmine\entity\CustomEntity;
 use pocketmine\world\Position;
 use pocketmine\player\Player;
 use VietnamPMTeam\BedWars\math\EnderDragon;
@@ -149,14 +150,14 @@ class BedWars extends PluginBase implements Listener {
     }
 
     public function registerEntity(){
-        EntityFactory::getInstance()->register(EnderDragon::class, true);
-        EntityFactory::getInstance()->register(ShopVillager::class, true);
-        EntityFactory::getInstance()->register(UpgradeVillager::class, true);
-        EntityFactory::getInstance()->register(\pocketmine\world\generator\GeneratorManager::getInstance()->class, true);
-        EntityFactory::getInstance()->register(Bedbug::class, true);
-        EntityFactory::getInstance()->register(Egg::class,true);
-        EntityFactory::getInstance()->register(Golem::class, true);
-        EntityFactory::getInstance()->register(Fireball::class, true);
+        CustomEntity::registerEntity(EnderDragon::class, true);
+        CustomEntity::registerEntity(ShopVillager::class, true);
+        CustomEntity::registerEntity(UpgradeVillager::class, true);
+        CustomEntity::registerEntity(Generator::class, true);
+        CustomEntity::registerEntity(Bedbug::class, true);
+        CustomEntity::registerEntity(Egg::class,true);
+        CustomEntity::registerEntity(Golem::class, true);
+        CustomEntity::registerEntity(Fireball::class, true);
     
     }
 
