@@ -12,6 +12,19 @@ use pocketmine\entity\Location;
 use pocketmine\world\World;
 
 class CustomEntity extends Location {
+	
+  /** @var int */
+  public static $entityCount = 1;
+  /**
+  * @var string[]
+  * @phpstan-var array<int|string, class-string<Entity>>
+  */
+  private static $knownEntities = [];
+  /**
+  * @var string[]
+  * @phpstan-var array<class-string<Entity>, string>
+  */
+  private static $saveNames = [];	
   
   public static function createEntity($type, World $level, CompoundTag $nbt, ...$args) : ?Entity{
 		if(isset(self::$knownEntities[$type])){
